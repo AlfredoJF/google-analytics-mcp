@@ -14,10 +14,13 @@
 
 """Common utilities used by the MCP server."""
 
+import json
+import os
 from typing import Any, Dict
 
 from google.analytics import admin_v1beta, data_v1beta
 from google.api_core.gapic_v1.client_info import ClientInfo
+import google.oauth2.credentials
 from importlib import metadata
 import google.auth
 import proto
@@ -46,15 +49,47 @@ _READ_ONLY_ANALYTICS_SCOPE = (
 
 
 def _create_credentials() -> google.auth.credentials.Credentials:
-    """Returns Application Default Credentials with read-only scope."""
-    (credentials, _) = google.auth.default(scopes=[_READ_ONLY_ANALYTICS_SCOPE])
+    """Returns Application Default Credentials with read-only scope.
+    
+    Priority:
+    1. CUSTOM_ADC_PATH environment variable if set (uses scopes from file if available)
+    2. Default ADC credentials
+    """
+    custom_adc_path = os.getenv("CUSTOM_ADC_PATH")
+
+    if custom_adc_path:
+        if not os.path.exists(custom_adc_path):
+            raise ValueError(
+                f"CUSTOM_ADC_PATH file not found at: {custom_adc_path}. "
+                "Please ensure the file exists and is accessible."
+            )
+
+        # Read the credentials file to extract scopes
+        with open(custom_adc_path, "r") as f:
+            creds = json.load(f)
+        
+        # Use scopes from the file if available, otherwise fall back to read-only scope
+        scopes = creds.get("scopes", [_READ_ONLY_ANALYTICS_SCOPE])
+        
+        # Create credentials from file
+        credentials = google.oauth2.credentials.Credentials.from_authorized_user_file(
+            custom_adc_path,
+            scopes=scopes
+        )
+    
+    else:
+        # Use existing ADC authentication as fallback
+        (credentials, _) = google.auth.default(scopes=[_READ_ONLY_ANALYTICS_SCOPE])
     return credentials
 
 
 def create_admin_api_client() -> admin_v1beta.AnalyticsAdminServiceAsyncClient:
     """Returns a properly configured Google Analytics Admin API async client.
 
-    Uses Application Default Credentials with read-only scope.
+    Uses credentials with priority:
+    1. CUSTOM_ADC_PATH environment variable if set
+    2. Default Application Default Credentials
+    All with read-only analytics scope.
     """
     return admin_v1beta.AnalyticsAdminServiceAsyncClient(
         client_info=_CLIENT_INFO, credentials=_create_credentials()
@@ -64,7 +99,10 @@ def create_admin_api_client() -> admin_v1beta.AnalyticsAdminServiceAsyncClient:
 def create_data_api_client() -> data_v1beta.BetaAnalyticsDataAsyncClient:
     """Returns a properly configured Google Analytics Data API async client.
 
-    Uses Application Default Credentials with read-only scope.
+    Uses credentials with priority:
+    1. CUSTOM_ADC_PATH environment variable if set
+    2. Default Application Default Credentials
+    All with read-only analytics scope.
     """
     return data_v1beta.BetaAnalyticsDataAsyncClient(
         client_info=_CLIENT_INFO, credentials=_create_credentials()
