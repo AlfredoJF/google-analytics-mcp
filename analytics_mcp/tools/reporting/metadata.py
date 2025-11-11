@@ -319,7 +319,7 @@ def get_order_bys_hints():
     title="Retrieves the custom Core Reporting dimensions and metrics for a specific property"
 )
 async def get_custom_dimensions_and_metrics(
-    property_id: str,
+    property_id: int | str,
 ) -> Dict[str, List[Dict[str, Any]]]:
     """Returns the property's custom dimensions and metrics.
 

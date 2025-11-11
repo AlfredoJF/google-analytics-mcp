@@ -109,19 +109,19 @@ def create_data_api_client() -> data_v1beta.BetaAnalyticsDataAsyncClient:
     )
 
 
-def construct_property_rn(property_value: str) -> str:
-    """Returns a property resource name in the format required by APIs.
-
-    Accepts both numeric strings and 'properties/ID' format for compatibility.
-    """
+def construct_property_rn(property_value: int | str) -> str:
+    """Returns a property resource name in the format required by APIs."""
     property_num = None
-    property_value = property_value.strip()
-    if property_value.isdigit():
-        property_num = int(property_value)
-    elif property_value.startswith("properties/"):
-        numeric_part = property_value.split("/")[-1]
-        if numeric_part.isdigit():
-            property_num = int(numeric_part)
+    if isinstance(property_value, int):
+        property_num = property_value
+    elif isinstance(property_value, str):
+        property_value = property_value.strip()
+        if property_value.isdigit():
+            property_num = int(property_value)
+        elif property_value.startswith("properties/"):
+            numeric_part = property_value.split("/")[-1]
+            if numeric_part.isdigit():
+                property_num = int(numeric_part)
     if property_num is None:
         raise ValueError(
             (
