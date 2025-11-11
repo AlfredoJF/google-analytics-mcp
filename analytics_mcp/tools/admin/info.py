@@ -39,7 +39,7 @@ async def get_account_summaries() -> List[Dict[str, Any]]:
 
 
 @mcp.tool(title="List links to Google Ads accounts")
-async def list_google_ads_links(property_id: int | str) -> List[Dict[str, Any]]:
+async def list_google_ads_links(property_id: str) -> List[Dict[str, Any]]:
     """Returns a list of links to Google Ads accounts for a property.
 
     Args:
@@ -60,7 +60,7 @@ async def list_google_ads_links(property_id: int | str) -> List[Dict[str, Any]]:
 
 
 @mcp.tool(title="Gets details about a property")
-async def get_property_details(property_id: int | str) -> Dict[str, Any]:
+async def get_property_details(property_id: str) -> Dict[str, Any]:
     """Returns details about a property.
     Args:
         property_id: The Google Analytics property ID. Accepted formats are:

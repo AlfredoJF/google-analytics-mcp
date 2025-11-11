@@ -80,7 +80,7 @@ def _run_report_description() -> str:
 
 
 async def run_report(
-    property_id: int | str,
+    property_id: str,
     date_ranges: List[Dict[str, str]],
     dimensions: List[str],
     metrics: List[str],

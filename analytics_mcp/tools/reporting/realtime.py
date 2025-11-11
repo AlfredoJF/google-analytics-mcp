@@ -78,7 +78,7 @@ def _run_realtime_report_description() -> str:
 
 
 async def run_realtime_report(
-    property_id: int | str,
+    property_id: str,
     dimensions: List[str],
     metrics: List[str],
     dimension_filter: Dict[str, Any] = None,
