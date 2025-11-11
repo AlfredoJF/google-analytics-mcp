@@ -18,7 +18,7 @@ import json
 import os
 from typing import Any, Dict
 
-from google.analytics import admin_v1beta, data_v1beta
+from google.analytics import admin_v1beta, data_v1beta, admin_v1alpha
 from google.api_core.gapic_v1.client_info import ClientInfo
 import google.oauth2.credentials
 from importlib import metadata
@@ -105,6 +105,17 @@ def create_data_api_client() -> data_v1beta.BetaAnalyticsDataAsyncClient:
     All with read-only analytics scope.
     """
     return data_v1beta.BetaAnalyticsDataAsyncClient(
+        client_info=_CLIENT_INFO, credentials=_create_credentials()
+    )
+
+
+def create_admin_alpha_api_client() -> (
+    admin_v1alpha.AnalyticsAdminServiceAsyncClient
+):
+    """Returns a properly configured Google Analytics Admin API (alpha) async client.
+    Uses Application Default Credentials with read-only scope.
+    """
+    return admin_v1alpha.AnalyticsAdminServiceAsyncClient(
         client_info=_CLIENT_INFO, credentials=_create_credentials()
     )
 
